@@ -1,13 +1,8 @@
 import { db } from './firebaseAdmin.js';
 import * as line from '@line/bot-sdk';
 
-const config = {
-    channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "DEBUG_TOKEN",
-    channelSecret: process.env.LINE_CHANNEL_SECRET,
-};
-const client = new line.messagingApi.MessagingApiClient({ channelAccessToken: config.channelAccessToken });
-
 export const handler = async (event, context) => {
+    // Basic Auth Check (In a real app, verify the Firebase ID token from headers)
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
@@ -41,6 +36,13 @@ export const handler = async (event, context) => {
             }
         }
 
+        // Initialize client inside handler to ensure process.env is populated in the execution context
+        const config = {
+            channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
+            channelSecret: process.env.LINE_CHANNEL_SECRET,
+        };
+        const client = new line.messagingApi.MessagingApiClient({ channelAccessToken: config.channelAccessToken });
+
         // Call LINE API
         await client.pushMessage({
             to: lineId,
@@ -54,9 +56,15 @@ export const handler = async (event, context) => {
         };
     } catch (err) {
         console.error("Push Message Error:", err);
+        const errStatus = err.statusCode || 500;
+        let errorMessage = err.message || 'Error sending message';
+        if (errStatus === 400 && err.originalError?.response?.data?.message) {
+            errorMessage += ' - ' + err.originalError.response.data.message;
+        }
+
         return {
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Error sending message', details: err.message })
+            statusCode: errStatus,
+            body: JSON.stringify({ error: errorMessage, details: err.statusMessage || '' })
         };
     }
 };

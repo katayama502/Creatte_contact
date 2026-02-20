@@ -2,14 +2,13 @@ import { schedule } from '@netlify/functions';
 import { db } from './firebaseAdmin.js';
 import * as line from '@line/bot-sdk';
 
-const config = {
-    channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "DEBUG_TOKEN",
-    channelSecret: process.env.LINE_CHANNEL_SECRET || "DEBUG_SECRET",
-};
-const client = new line.messagingApi.MessagingApiClient({ channelAccessToken: config.channelAccessToken });
-
 const handlerFunc = async (event, context) => {
     console.log("Running Daily Reminder task");
+    const config = {
+        channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
+        channelSecret: process.env.LINE_CHANNEL_SECRET,
+    };
+    const client = new line.messagingApi.MessagingApiClient({ channelAccessToken: config.channelAccessToken });
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
