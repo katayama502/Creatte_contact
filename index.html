@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LINE連携型シフト・生徒管理システム</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body class="bg-gray-50 text-gray-800 h-screen flex overflow-hidden font-sans">
+    
+    <!-- Login Screen -->
+    <div id="login-container" class="absolute inset-0 bg-gray-50 flex items-center justify-center z-50">
+      <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-md w-full mx-4">
+        <h1 class="text-2xl font-bold text-center text-primary-600 mb-6">ShiftManager Login</h1>
+        <form id="login-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" id="login-email" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" placeholder="admin@example.com">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input type="password" id="login-password" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" placeholder="••••••••">
+          </div>
+          <p id="login-error" class="text-red-500 text-sm hidden"></p>
+          <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg px-4 py-2 transition-colors">
+            ログイン
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- App Container -->
+    <div id="app-container" class="flex w-full h-full hidden">
+      <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex">
+      <div class="h-16 flex items-center px-6 border-b border-gray-200">
+        <h1 class="text-xl font-bold text-primary-600 truncate">ShiftManager</h1>
+      </div>
+      
+      <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <a href="#dashboard" class="nav-link flex items-center px-4 py-3 text-gray-700 bg-primary-50 text-primary-600 rounded-xl transition-colors font-medium">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+          ダッシュボード
+        </a>
+        <a href="#calendar" class="nav-link flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors font-medium">
+          <i data-lucide="calendar" class="w-5 h-5 mr-3"></i>
+          シフトカレンダー
+        </a>
+        <a href="#students" class="nav-link flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors font-medium">
+          <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+          生徒・講師名簿
+        </a>
+        <a href="#settings" class="nav-link flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors font-medium">
+          <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
+          設定
+        </a>
+      </nav>
+      
+      <div class="p-4 border-t border-gray-200">
+        <div class="flex items-center px-4 py-2 text-sm text-gray-600 mb-2">
+          <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold mr-3">
+            A
+          </div>
+          <div>
+            <p class="font-medium text-gray-900">管理者</p>
+            <p class="text-xs text-gray-500" id="user-email-display">admin@example.com</p>
+          </div>
+        </div>
+        <button id="logout-btn" class="w-full flex items-center justify-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium">
+          <i data-lucide="log-out" class="w-4 h-4 mr-2"></i>ログアウト
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+      <!-- Mobile Header -->
+      <header class="md:hidden h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4">
+        <h1 class="text-xl font-bold text-primary-600">ShiftManager</h1>
+        <button class="text-gray-500 hover:text-gray-900">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </header>
+      
+      <!-- Views Container -->
+      <div class="flex-1 overflow-y-auto p-4 md:p-8" id="views-container">
+        
+        <!-- Dashboard View -->
+        <section id="view-dashboard" class="view hidden">
+          <h2 class="text-2xl font-bold mb-6">ダッシュボード</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
+              <div class="bg-blue-100 p-3 rounded-lg mr-4 text-blue-600">
+                <i data-lucide="calendar-check" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500 font-medium">本日の授業</p>
+                <p class="text-2xl font-bold">5件</p>
+              </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
+              <div class="bg-red-100 p-3 rounded-lg mr-4 text-red-600">
+                <i data-lucide="alert-circle" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500 font-medium">直近キャンセル</p>
+                <p class="text-2xl font-bold">1件</p>
+              </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
+              <div class="bg-green-100 p-3 rounded-lg mr-4 text-green-600">
+                <i data-lucide="message-square" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500 font-medium">未送信リマインド</p>
+                <p class="text-2xl font-bold">3件</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 font-medium">本日のスケジュール</div>
+            <div class="p-6 text-center text-gray-500 py-12">
+              <i data-lucide="calendar" class="w-12 h-12 mx-auto text-gray-300 mb-3"></i>
+              <p>今日の予定はまだありません</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Calendar View -->
+        <section id="view-calendar" class="view hidden">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold">シフトカレンダー</h2>
+            <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center">
+              <i data-lucide="plus" class="w-4 h-4 mr-2"></i>予定追加
+            </button>
+          </div>
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 min-h-[500px] flex items-center justify-center">
+            <p class="text-gray-500">カレンダーUIがここに表示されます</p>
+          </div>
+        </section>
+
+        <!-- Students View -->
+        <section id="view-students" class="view hidden">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold">生徒・講師名簿</h2>
+            <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center">
+              <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>生徒追加
+            </button>
+          </div>
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+             <table class="w-full text-left">
+              <thead class="bg-gray-50 border-b border-gray-100 text-sm text-gray-500">
+                <tr>
+                  <th class="px-6 py-4 font-medium">名前</th>
+                  <th class="px-6 py-4 font-medium">ステータス</th>
+                  <th class="px-6 py-4 font-medium">LINE連携</th>
+                  <th class="px-6 py-4 font-medium text-right">アクション</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <!-- Data rows go here -->
+              </tbody>
+            </table>
+            <div class="p-12 text-center text-gray-500">データがありません</div>
+          </div>
+        </section>
+
+        <!-- Settings View -->
+        <section id="view-settings" class="view hidden">
+          <h2 class="text-2xl font-bold mb-6">設定・通知テンプレート</h2>
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+             <h3 class="text-lg font-medium mb-4">予約確認テンプレート</h3>
+             <textarea class="w-full h-32 border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" disabled>
+{name}様、ご予約ありがとうございます。
+以下の日程で予定を承りました。
+
+日時：{date} {time}
+変更やキャンセルの場合は、この画面からお知らせください。</textarea>
+             <div class="mt-4 flex justify-end">
+               <button class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium text-sm">編集</button>
+             </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+    </div>
+    
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center">
+      <div class="bg-white rounded-2xl shadow-lg max-w-lg w-full mx-4 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 id="modal-title" class="text-lg font-bold text-gray-900">メッセージ送信確認</h3>
+          <button id="modal-close" class="text-gray-400 hover:text-gray-600">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="p-6">
+          <p class="text-sm text-gray-600 mb-4">以下の内容でLINEメッセージを送信します。内容を微調整できます。</p>
+          <div id="modal-editor" contenteditable="true" class="w-full border border-gray-200 rounded-lg p-4 min-h-[150px] outline-none focus:ring-2 focus:ring-primary-500 whitespace-pre-wrap"></div>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end space-x-3">
+          <button id="modal-cancel" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">キャンセル</button>
+          <button id="modal-confirm" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 flex items-center transition-colors">
+            <i data-lucide="send" class="w-4 h-4 mr-2"></i>送信確定
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
