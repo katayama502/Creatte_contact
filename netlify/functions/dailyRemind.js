@@ -1,6 +1,6 @@
-const { schedule } = require('@netlify/functions');
-const { db } = require('./firebaseAdmin');
-const line = require('@line/bot-sdk');
+import { schedule } from '@netlify/functions';
+import { db } from './firebaseAdmin.js';
+import * as line from '@line/bot-sdk';
 
 const config = {
     channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "DEBUG_TOKEN",
@@ -8,7 +8,7 @@ const config = {
 };
 const client = new line.messagingApi.MessagingApiClient({ channelAccessToken: config.channelAccessToken });
 
-const handler = async (event, context) => {
+const handlerFunc = async (event, context) => {
     console.log("Running Daily Reminder task");
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -59,4 +59,4 @@ const handler = async (event, context) => {
 };
 
 // Run every day at 20:00 JST (11:00 UTC)
-exports.handler = schedule('0 11 * * *', handler);
+export const handler = schedule('0 11 * * *', handlerFunc);

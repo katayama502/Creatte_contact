@@ -1,4 +1,4 @@
-const admin = require('firebase-admin');
+import admin from 'firebase-admin';
 
 // Initialize Firebase Admin using a service account or default credentials
 if (!admin.apps.length) {
@@ -7,6 +7,5 @@ if (!admin.apps.length) {
     });
 }
 
-const db = admin.firestore();
-
-module.exports = { admin, db };
+export const db = admin.firestore();
+export { admin };

@@ -1,5 +1,5 @@
-const { db } = require('./firebaseAdmin');
-const line = require('@line/bot-sdk');
+import { db } from './firebaseAdmin.js';
+import * as line from '@line/bot-sdk';
 
 const config = {
     channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "DEBUG_TOKEN",
@@ -7,7 +7,7 @@ const config = {
 };
 const client = new line.messagingApi.MessagingApiClient({ channelAccessToken: config.channelAccessToken });
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
