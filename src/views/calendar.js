@@ -1,5 +1,6 @@
 import { getSchedules, addSchedule } from '../db.js';
 import { Timestamp } from 'firebase/firestore';
+import { addScheduleModal } from '../ui.js';
 
 export async function initCalendarView() {
   const container = document.querySelector('#view-calendar .bg-white.rounded-2xl');
@@ -61,27 +62,31 @@ export async function initCalendarView() {
   const addScheduleBtn = document.getElementById('add-schedule-btn');
   if (addScheduleBtn && !addScheduleBtn.dataset.initialized) {
     addScheduleBtn.dataset.initialized = 'true';
-    addScheduleBtn.addEventListener('click', async () => {
-      const studentName = prompt('生徒名（またはID）を入力してください:');
-      if (studentName) {
-        try {
-          // Mock tomorrow's date for simplicity
-          const tomorrow = new Date();
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          tomorrow.setHours(20, 0, 0, 0);
+    addScheduleBtn.addEventListener('click', () => {
+      addScheduleModal.open();
+    });
 
-          await addSchedule({
-            studentId: 'mock-id-' + Date.now(),
-            studentName: studentName,
-            teacherName: '先生A',
-            status: 'confirmed',
-            startAt: Timestamp.fromDate(tomorrow)
-          });
-          await render();
-        } catch (e) {
-          console.error("Failed to add schedule", e);
-          alert('予定の追加に失敗しました。');
-        }
+    addScheduleModal.form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const studentName = document.getElementById('schedule-student').value;
+      const teacherName = document.getElementById('schedule-teacher').value;
+      const datetimeStr = document.getElementById('schedule-datetime').value;
+      const status = document.getElementById('schedule-status').value;
+
+      try {
+        const dateObj = new Date(datetimeStr);
+        await addSchedule({
+          studentId: 'added-' + Date.now(),
+          studentName: studentName,
+          teacherName: teacherName,
+          status: status,
+          startAt: Timestamp.fromDate(dateObj)
+        });
+        addScheduleModal.close();
+        await render();
+      } catch (err) {
+        console.error("Failed to add schedule", err);
+        alert('予定の追加に失敗しました。');
       }
     });
   }

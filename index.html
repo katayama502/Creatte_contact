@@ -211,6 +211,84 @@
       </div>
     </div>
 
+    <!-- Add Student Modal -->
+    <div id="add-student-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center">
+      <div class="bg-white rounded-2xl shadow-lg max-w-lg w-full mx-4 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-900">新規生徒追加</h3>
+          <button id="add-student-close" class="text-gray-400 hover:text-gray-600">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <form id="add-student-form">
+          <div class="p-6 space-y-4">
+            <div>
+              <label for="student-name" class="block text-sm font-medium text-gray-700 mb-1">生徒名 <span class="text-red-500">*</span></label>
+              <input type="text" id="student-name" required class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
+            </div>
+            <div>
+              <label for="student-line-id" class="block text-sm font-medium text-gray-700 mb-1">LINE ID</label>
+              <input type="text" id="student-line-id" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" placeholder="連携後に自動入力推奨">
+            </div>
+            <div>
+              <label for="student-status" class="block text-sm font-medium text-gray-700 mb-1">ステータス</label>
+              <select id="student-status" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
+                <option value="active">有効</option>
+                <option value="inactive">停止中</option>
+              </select>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end space-x-3">
+            <button type="button" id="add-student-cancel" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">キャンセル</button>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+              追加する
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Schedule Modal -->
+    <div id="add-schedule-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center">
+      <div class="bg-white rounded-2xl shadow-lg max-w-lg w-full mx-4 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-900">新規予定追加</h3>
+          <button id="add-schedule-close" class="text-gray-400 hover:text-gray-600">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <form id="add-schedule-form">
+          <div class="p-6 space-y-4">
+            <div>
+              <label for="schedule-student" class="block text-sm font-medium text-gray-700 mb-1">生徒名 <span class="text-red-500">*</span></label>
+              <input type="text" id="schedule-student" required class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
+            </div>
+            <div>
+              <label for="schedule-teacher" class="block text-sm font-medium text-gray-700 mb-1">担当講師 <span class="text-red-500">*</span></label>
+              <input type="text" id="schedule-teacher" required class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
+            </div>
+            <div>
+              <label for="schedule-datetime" class="block text-sm font-medium text-gray-700 mb-1">日時 <span class="text-red-500">*</span></label>
+              <input type="datetime-local" id="schedule-datetime" required class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
+            </div>
+            <div>
+              <label for="schedule-status" class="block text-sm font-medium text-gray-700 mb-1">ステータス</label>
+              <select id="schedule-status" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
+                <option value="confirmed">確定</option>
+                <option value="canceled">キャンセル</option>
+              </select>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end space-x-3">
+            <button type="button" id="add-schedule-cancel" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">キャンセル</button>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+              登録する
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>

@@ -1,5 +1,5 @@
 import { getStudents, addStudent } from '../db.js';
-import { modal } from '../ui.js';
+import { modal, addStudentModal } from '../ui.js';
 
 export async function initStudentsView() {
   const tbody = document.querySelector('#view-students tbody');
@@ -76,20 +76,27 @@ export async function initStudentsView() {
   const addStudentBtn = document.getElementById('add-student-btn');
   if (addStudentBtn && !addStudentBtn.dataset.initialized) {
     addStudentBtn.dataset.initialized = 'true';
-    addStudentBtn.addEventListener('click', async () => {
-      const name = prompt('生徒名を入力してください:');
-      if (name) {
-        try {
-          await addStudent({
-            name,
-            lineId: '',
-            status: 'active'
-          });
-          await render();
-        } catch (e) {
-          console.error("Failed to add student", e);
-          alert('生徒の追加に失敗しました。');
-        }
+    addStudentBtn.addEventListener('click', () => {
+      addStudentModal.open();
+    });
+
+    addStudentModal.form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('student-name').value;
+      const lineId = document.getElementById('student-line-id').value;
+      const status = document.getElementById('student-status').value;
+
+      try {
+        await addStudent({
+          name,
+          lineId,
+          status
+        });
+        addStudentModal.close();
+        await render();
+      } catch (err) {
+        console.error("Failed to add student", err);
+        alert('生徒の追加に失敗しました。');
       }
     });
   }
