@@ -1,4 +1,4 @@
-import { getStudents } from '../db.js';
+import { getStudents, addStudent } from '../db.js';
 import { modal } from '../ui.js';
 
 export async function initStudentsView() {
@@ -72,6 +72,27 @@ export async function initStudentsView() {
       }
     });
   });
+
+  const addStudentBtn = document.getElementById('add-student-btn');
+  if (addStudentBtn && !addStudentBtn.dataset.initialized) {
+    addStudentBtn.dataset.initialized = 'true';
+    addStudentBtn.addEventListener('click', async () => {
+      const name = prompt('生徒名を入力してください:');
+      if (name) {
+        try {
+          await addStudent({
+            name,
+            lineId: '',
+            status: 'active'
+          });
+          await render();
+        } catch (e) {
+          console.error("Failed to add student", e);
+          alert('生徒の追加に失敗しました。');
+        }
+      }
+    });
+  }
 
   return { render };
 }
