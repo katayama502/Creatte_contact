@@ -1,5 +1,5 @@
-import { getStudents, addStudent } from '../db.js';
-import { modal, addStudentModal } from '../ui.js';
+import { getStudents, addStudent, updateStudent } from '../db.js';
+import { modal, addStudentModal, editStudentModal } from '../ui.js';
 
 export async function initStudentsView() {
   const tbody = document.querySelector('#view-students tbody');
@@ -28,6 +28,9 @@ export async function initStudentsView() {
             </span>
           </td>
           <td class="px-6 py-4 text-right">
+            <button data-id="${student.id}" data-name="${student.name}" data-line="${student.lineId || ''}" data-status="${student.status}" class="edit-student-btn inline-flex items-center px-2 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 mr-2">
+              <i data-lucide="edit" class="w-4 h-4 mr-1 text-gray-400"></i>編集
+            </button>
             <button data-id="${student.id}" data-name="${student.name}" class="send-msg-btn inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
               <i data-lucide="message-square" class="w-4 h-4 mr-1.5 text-gray-400"></i>内容編集して送信
             </button>
@@ -41,12 +44,23 @@ export async function initStudentsView() {
     }
   };
 
-  // Event delegation for message sending
+  // Event delegation for message sending and editing
   tbody.addEventListener('click', (e) => {
-    const btn = e.target.closest('.send-msg-btn');
-    if (!btn) return;
+    const editBtn = e.target.closest('.edit-student-btn');
+    if (editBtn) {
+      editStudentModal.open({
+        id: editBtn.dataset.id,
+        name: editBtn.dataset.name,
+        lineId: editBtn.dataset.line,
+        status: editBtn.dataset.status
+      });
+      return;
+    }
 
-    const studentName = btn.dataset.name;
+    const sendBtn = e.target.closest('.send-msg-btn');
+    if (!sendBtn) return;
+
+    const studentName = sendBtn.dataset.name;
     const defaultText = `${studentName}様\nご案内事項がございます。\nよろしくお願いします。`;
 
     modal.open({
@@ -57,7 +71,7 @@ export async function initStudentsView() {
           const res = await fetch('/.netlify/functions/sendPushMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer DUMMY_TOKEN' },
-            body: JSON.stringify({ studentId: btn.dataset.id, text: finalText })
+            body: JSON.stringify({ studentId: sendBtn.dataset.id, text: finalText })
           });
           if (res.ok) {
             alert('メッセージを送信しました');
@@ -97,6 +111,22 @@ export async function initStudentsView() {
       } catch (err) {
         console.error("Failed to add student", err);
         alert('生徒の追加に失敗しました。');
+      }
+    });
+    editStudentModal.form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('edit-student-id').value;
+      const name = document.getElementById('edit-student-name').value;
+      const lineId = document.getElementById('edit-student-line-id').value;
+      const status = document.getElementById('edit-student-status').value;
+
+      try {
+        await updateStudent(id, { name, lineId, status });
+        editStudentModal.close();
+        await render();
+      } catch (err) {
+        console.error("Failed to update student", err);
+        alert('生徒の更新に失敗しました。');
       }
     });
   }

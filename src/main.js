@@ -1,7 +1,7 @@
 import './style.css'
 import { auth } from './firebase.js';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
-import { modal, addStudentModal, addScheduleModal } from './ui.js';
+import { modal, addStudentModal, addScheduleModal, editStudentModal, editScheduleModal } from './ui.js';
 import { initDashboardView } from './views/dashboard.js';
 import { initCalendarView } from './views/calendar.js';
 import { initStudentsView } from './views/students.js';
@@ -70,6 +70,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   modal.init();
   addStudentModal.init();
   addScheduleModal.init();
+  editStudentModal.init();
+  editScheduleModal.init();
 
   // Initialize View Modules
   try {

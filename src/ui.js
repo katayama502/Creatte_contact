@@ -89,3 +89,63 @@ export const addScheduleModal = {
         this.overlay.classList.remove('flex');
     }
 };
+
+// Edit Student Modal UI
+export const editStudentModal = {
+    overlay: document.getElementById('edit-student-modal'),
+    closeBtn: document.getElementById('edit-student-close'),
+    cancelBtn: document.getElementById('edit-student-cancel'),
+    form: document.getElementById('edit-student-form'),
+    init() {
+        if (!this.overlay) return;
+        this.closeBtn.addEventListener('click', () => this.close());
+        this.cancelBtn.addEventListener('click', () => this.close());
+    },
+    open(student) {
+        document.getElementById('edit-student-id').value = student.id;
+        document.getElementById('edit-student-name').value = student.name;
+        document.getElementById('edit-student-line-id').value = student.lineId || '';
+        document.getElementById('edit-student-status').value = student.status || 'active';
+
+        this.overlay.classList.remove('hidden');
+        this.overlay.classList.add('flex');
+    },
+    close() {
+        this.overlay.classList.add('hidden');
+        this.overlay.classList.remove('flex');
+    }
+};
+
+// Edit Schedule Modal UI
+export const editScheduleModal = {
+    overlay: document.getElementById('edit-schedule-modal'),
+    closeBtn: document.getElementById('edit-schedule-close'),
+    cancelBtn: document.getElementById('edit-schedule-cancel'),
+    form: document.getElementById('edit-schedule-form'),
+    init() {
+        if (!this.overlay) return;
+        this.closeBtn.addEventListener('click', () => this.close());
+        this.cancelBtn.addEventListener('click', () => this.close());
+    },
+    open(schedule) {
+        document.getElementById('edit-schedule-id').value = schedule.id;
+        document.getElementById('edit-schedule-student').value = schedule.studentName;
+        document.getElementById('edit-schedule-teacher').value = schedule.teacherName;
+        document.getElementById('edit-schedule-status').value = schedule.status;
+
+        if (schedule.startAt && schedule.startAt.toDate) {
+            const tmr = schedule.startAt.toDate();
+            // offset to local timezone input format
+            const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(tmr - tzoffset)).toISOString().slice(0, 16);
+            document.getElementById('edit-schedule-datetime').value = localISOTime;
+        }
+
+        this.overlay.classList.remove('hidden');
+        this.overlay.classList.add('flex');
+    },
+    close() {
+        this.overlay.classList.add('hidden');
+        this.overlay.classList.remove('flex');
+    }
+};

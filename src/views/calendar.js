@@ -1,6 +1,7 @@
-import { getSchedules, addSchedule } from '../db.js';
-import { Timestamp } from 'firebase/firestore';
-import { addScheduleModal } from '../ui.js';
+import { getSchedules, addSchedule, updateScheduleStatus } from '../db.js';
+import { Timestamp, doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase.js';
+import { addScheduleModal, editScheduleModal } from '../ui.js';
 
 export async function initCalendarView() {
   const container = document.querySelector('#view-calendar .bg-white.rounded-2xl');
@@ -43,7 +44,7 @@ export async function initCalendarView() {
                       </span>
                     </td>
                     <td class="px-6 py-4 text-right">
-                       <button class="text-primary-600 hover:text-primary-800 font-medium text-sm">詳細 / 変更</button>
+                       <button data-id="${s.id}" data-student="${s.studentName}" data-teacher="${s.teacherName}" data-status="${s.status}" data-time="${s.startAt ? s.startAt.toMillis() : ''}" class="edit-schedule-btn text-primary-600 hover:text-primary-800 font-medium text-sm">詳細 / 変更</button>
                     </td>
                   </tr>
                 `;
@@ -58,6 +59,21 @@ export async function initCalendarView() {
       container.innerHTML = '<div class="p-12 text-center text-red-500">カレンダーデータの取得に失敗しました</div>';
     }
   };
+
+  // Event delegation for schedule editing
+  container.addEventListener('click', (e) => {
+    const editBtn = e.target.closest('.edit-schedule-btn');
+    if (editBtn) {
+      const timeMillis = parseInt(editBtn.dataset.time, 10);
+      editScheduleModal.open({
+        id: editBtn.dataset.id,
+        studentName: editBtn.dataset.student,
+        teacherName: editBtn.dataset.teacher,
+        status: editBtn.dataset.status,
+        startAt: timeMillis ? Timestamp.fromMillis(timeMillis) : null
+      });
+    }
+  });
 
   const addScheduleBtn = document.getElementById('add-schedule-btn');
   if (addScheduleBtn && !addScheduleBtn.dataset.initialized) {
@@ -87,6 +103,31 @@ export async function initCalendarView() {
       } catch (err) {
         console.error("Failed to add schedule", err);
         alert('予定の追加に失敗しました。');
+      }
+    });
+
+    editScheduleModal.form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('edit-schedule-id').value;
+      const studentName = document.getElementById('edit-schedule-student').value;
+      const teacherName = document.getElementById('edit-schedule-teacher').value;
+      const datetimeStr = document.getElementById('edit-schedule-datetime').value;
+      const status = document.getElementById('edit-schedule-status').value;
+
+      try {
+        const dateObj = new Date(datetimeStr);
+        const docRef = doc(db, 'schedules', id);
+        await updateDoc(docRef, {
+          studentName,
+          teacherName,
+          status,
+          startAt: Timestamp.fromDate(dateObj)
+        });
+        editScheduleModal.close();
+        await render();
+      } catch (err) {
+        console.error("Failed to update schedule", err);
+        alert('予定の更新に失敗しました。');
       }
     });
   }
