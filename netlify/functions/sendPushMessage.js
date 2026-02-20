@@ -19,19 +19,26 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { studentId, text } = JSON.parse(event.body);
-        if (!studentId || !text) {
-            return { statusCode: 400, body: JSON.stringify({ error: 'Missing parameters' }) };
+        const { studentId, testLineId, text } = JSON.parse(event.body);
+        if (!studentId && !testLineId) {
+            return { statusCode: 400, body: JSON.stringify({ error: 'Missing studentId or testLineId' }) };
+        }
+        if (!text) {
+            return { statusCode: 400, body: JSON.stringify({ error: 'Missing text content' }) };
         }
 
-        const studentDoc = await db.collection('students').doc(studentId).get();
-        if (!studentDoc.exists) {
-            return { statusCode: 404, body: JSON.stringify({ error: 'Student not found' }) };
-        }
+        let lineId = testLineId; // Use test ID if provided bypasses DB lookup
 
-        const lineId = studentDoc.data().lineId;
-        if (!lineId) {
-            return { statusCode: 400, body: JSON.stringify({ error: 'Student has no linked LINE ID' }) };
+        if (!lineId && studentId) {
+            const studentDoc = await db.collection('students').doc(studentId).get();
+            if (!studentDoc.exists) {
+                return { statusCode: 404, body: JSON.stringify({ error: 'Student not found' }) };
+            }
+
+            lineId = studentDoc.data().lineId;
+            if (!lineId) {
+                return { statusCode: 400, body: JSON.stringify({ error: 'Student has no linked LINE ID' }) };
+            }
         }
 
         // Call LINE API
